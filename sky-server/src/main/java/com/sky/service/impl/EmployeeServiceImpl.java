@@ -72,7 +72,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public void addEmployee(EmployeeDTO employeeDTO) {
         Employee employee = new Employee();
         //对象拷贝工具,从原对象属性开始拷贝到新对象，要求属性名必须一致
-        BeanUtils.copyProperties(employeeDTO,employee);
+        BeanUtils.copyProperties(employeeDTO, employee);
         //设置账号状态,使用常量类，降低代码耦合度
         employee.setStatus(StatusConstant.ENABLE);
         //设置密码，初始密码存储在密码常量类中123456,使用MD5加密
@@ -89,19 +89,37 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     /**
      * 分页查询员工
+     *
      * @param employeePageQueryDTO
      * @return
      */
     @Override
     public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
         //分页查询
-        PageHelper.startPage(employeePageQueryDTO.getPage(),employeePageQueryDTO.getPageSize());
-        Page<Employee> page =  employeeMapper.pageQuery(employeePageQueryDTO);
+        PageHelper.startPage(employeePageQueryDTO.getPage(), employeePageQueryDTO.getPageSize());
+        Page<Employee> page = employeeMapper.pageQuery(employeePageQueryDTO);
 
         long total = page.getTotal();
         List<Employee> records = page.getResult();
         PageResult pageResult = new PageResult(total, records);
         return pageResult;
+    }
+
+    /**
+     * 修改员工账号状态
+     *
+     * @param status
+     * @param id
+     */
+    @Override
+    public void updateStatus(Integer status, Long id) {
+        //做一个更新汇总方法，增强语句通用性
+        //创建一个实体类,builder注解
+        Employee employee = Employee.builder()
+                .status(status)
+                .id(id)
+                .build();
+        employeeMapper.update(employee);
     }
 
 }
